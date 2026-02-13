@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tarjeta de Amistad</title>
+
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'Segoe UI', sans-serif;
+}
+
+body{
+    background:linear-gradient(270deg,
+        #ff9a9e,#fad0c4,#fbc2eb,#a6c1ee,#b2fefa,#c2ffd8);
+    background-size:1200% 1200%;
+    animation:bgMove 18s ease infinite;
+}
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+/* Tarjeta */
+.card{
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    width:420px;
+    padding:36px;
+    background:rgba(255,255,255,0.97);
+    border-radius:28px;
+    box-shadow:0 35px 80px rgba(0,0,0,0.35);
+    text-align:center;
+}
+.card h1{color:#6a1b9a;margin:0}
+.card p{color:#444;line-height:1.7;margin-top:14px}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="card">
+    <h1>✨ Para una gran amiga ✨</h1>
+    <p>
+        Este detalle es una pequeña forma de decir
+        <strong>gracias</strong> por tu amistad, por las risas
+        y los momentos que hacen especiales los días.
+    </p>
+    <p>💫 Gracias por tu gran amistad 💫</p>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const particles = [];
+const TOTAL = 1200;
+
+// Centro de la carita (ARRIBA y GRANDE)
+const cx = canvas.width / 2;
+const cy = canvas.height * 0.22;
+const R  = 130;
+
+// Crear partículas
+for(let i=0;i<TOTAL;i++){
+    particles.push({
+        x: Math.random()*canvas.width,
+        y: canvas.height + Math.random()*300,
+        tx: cx,
+        ty: cy,
+        size: 5,
+        hue: Math.random()*360
+    });
+}
+
+/* Asignar forma de carita matemáticamente */
+function buildSmile(){
+    let index = 0;
+
+    // Contorno de la cara
+    for(let a=0;a<Math.PI*2;a+=0.02){
+        if(index>=particles.length) break;
+        particles[index].tx = cx + Math.cos(a)*R;
+        particles[index].ty = cy + Math.sin(a)*R;
+        index++;
+    }
+
+    // Ojo izquierdo
+    for(let a=0;a<Math.PI*2;a+=0.08){
+        if(index>=particles.length) break;
+        particles[index].tx = cx - 45 + Math.cos(a)*12;
+        particles[index].ty = cy - 40 + Math.sin(a)*12;
+        index++;
+    }
+
+    // Ojo derecho
+    for(let a=0;a<Math.PI*2;a+=0.08){
+        if(index>=particles.length) break;
+        particles[index].tx = cx + 45 + Math.cos(a)*12;
+        particles[index].ty = cy - 40 + Math.sin(a)*12;
+        index++;
+    }
+
+    // Sonrisa
+    for(let a=0;a<Math.PI;a+=0.03){
+        if(index>=particles.length) break;
+        particles[index].tx = cx + Math.cos(a)*60;
+        particles[index].ty = cy + 30 + Math.sin(a)*40;
+        index++;
+    }
+}
+
+setTimeout(buildSmile, 500);
+
+/* Animación */
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+        p.x += (p.tx - p.x)*0.12;
+        p.y += (p.ty - p.y)*0.12;
+
+        ctx.fillStyle = `hsl(${p.hue},85%,55%)`;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+
+onresize=()=>{
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+};
+</script>
+
+</body>
