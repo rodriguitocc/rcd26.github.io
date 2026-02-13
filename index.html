@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tarjeta de Amistad</title>
 
 <style>
@@ -10,14 +11,15 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    font-family:'Segoe UI', sans-serif;
+    font-family:'Segoe UI', system-ui, sans-serif;
 }
 
+/* Fondo animado suave */
 body{
     background:linear-gradient(270deg,
         #ff9a9e,#fad0c4,#fbc2eb,#a6c1ee,#b2fefa,#c2ffd8);
     background-size:1200% 1200%;
-    animation:bgMove 18s ease infinite;
+    animation:bgMove 20s ease infinite;
 }
 @keyframes bgMove{
     0%{background-position:0% 50%}
@@ -34,18 +36,37 @@ canvas{
 /* Tarjeta */
 .card{
     position:absolute;
-    bottom:40px;
+    bottom:18px;
     left:50%;
     transform:translateX(-50%);
-    width:420px;
-    padding:36px;
+    width:92%;
+    max-width:420px;
+    padding:22px;
     background:rgba(255,255,255,0.97);
-    border-radius:28px;
-    box-shadow:0 35px 80px rgba(0,0,0,0.35);
+    border-radius:22px;
+    box-shadow:0 25px 60px rgba(0,0,0,0.3);
     text-align:center;
+    z-index:2;
 }
-.card h1{color:#6a1b9a;margin:0}
-.card p{color:#444;line-height:1.7;margin-top:14px}
+
+.card h1{
+    margin:0;
+    font-size:22px;
+    color:#6a1b9a;
+}
+
+.card p{
+    margin-top:12px;
+    font-size:15px;
+    color:#444;
+    line-height:1.6;
+}
+
+.card .footer{
+    margin-top:14px;
+    font-size:14px;
+    color:#555;
+}
 </style>
 </head>
 
@@ -57,87 +78,94 @@ canvas{
     <h1>✨ Para una gran amiga ✨</h1>
     <p>
         Este detalle es una pequeña forma de decir
-        <strong>gracias</strong> por tu amistad, por las risas
-        y los momentos que hacen especiales los días.
+        <strong>gracias</strong> por tu amistad, por las
+        risas, el apoyo y los momentos que hacen
+        especiales los días.
     </p>
-    <p>💫 Gracias por tu gran amistad 💫</p>
+    <p>
+        Que nunca falten sonrisas, colores
+        y razones para seguir adelante.
+    </p>
+    <div class="footer">
+        💫 Gracias por tu gran amistad 💫
+    </div>
 </div>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-const particles = [];
-const TOTAL = 1200;
-
-// Centro de la carita (ARRIBA y GRANDE)
-const cx = canvas.width / 2;
-const cy = canvas.height * 0.22;
-const R  = 130;
-
-// Crear partículas
-for(let i=0;i<TOTAL;i++){
-    particles.push({
-        x: Math.random()*canvas.width,
-        y: canvas.height + Math.random()*300,
-        tx: cx,
-        ty: cy,
-        size: 5,
-        hue: Math.random()*360
-    });
+function resize(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
 }
+resize();
 
-/* Asignar forma de carita matemáticamente */
+const particles=[];
+const TOTAL = 900; // optimizado celular
+
+function createParticles(){
+    particles.length = 0;
+    for(let i=0;i<TOTAL;i++){
+        particles.push({
+            x: Math.random()*canvas.width,
+            y: canvas.height + Math.random()*200,
+            tx:0, ty:0,
+            size:4,
+            hue:Math.random()*360
+        });
+    }
+}
+createParticles();
+
+/* Centro de la carita (arriba y grande) */
 function buildSmile(){
-    let index = 0;
+    const cx = canvas.width / 2;
+    const cy = canvas.height * 0.22;
+    const R  = canvas.width * 0.28;
 
-    // Contorno de la cara
-    for(let a=0;a<Math.PI*2;a+=0.02){
-        if(index>=particles.length) break;
-        particles[index].tx = cx + Math.cos(a)*R;
-        particles[index].ty = cy + Math.sin(a)*R;
-        index++;
+    let i = 0;
+
+    // Cara
+    for(let a=0;a<Math.PI*2 && i<particles.length;a+=0.035){
+        particles[i].tx = cx + Math.cos(a)*R;
+        particles[i].ty = cy + Math.sin(a)*R;
+        i++;
     }
 
     // Ojo izquierdo
-    for(let a=0;a<Math.PI*2;a+=0.08){
-        if(index>=particles.length) break;
-        particles[index].tx = cx - 45 + Math.cos(a)*12;
-        particles[index].ty = cy - 40 + Math.sin(a)*12;
-        index++;
+    for(let a=0;a<Math.PI*2 && i<particles.length;a+=0.12){
+        particles[i].tx = cx - R*0.35 + Math.cos(a)*R*0.08;
+        particles[i].ty = cy - R*0.35 + Math.sin(a)*R*0.08;
+        i++;
     }
 
     // Ojo derecho
-    for(let a=0;a<Math.PI*2;a+=0.08){
-        if(index>=particles.length) break;
-        particles[index].tx = cx + 45 + Math.cos(a)*12;
-        particles[index].ty = cy - 40 + Math.sin(a)*12;
-        index++;
+    for(let a=0;a<Math.PI*2 && i<particles.length;a+=0.12){
+        particles[i].tx = cx + R*0.35 + Math.cos(a)*R*0.08;
+        particles[i].ty = cy - R*0.35 + Math.sin(a)*R*0.08;
+        i++;
     }
 
     // Sonrisa
-    for(let a=0;a<Math.PI;a+=0.03){
-        if(index>=particles.length) break;
-        particles[index].tx = cx + Math.cos(a)*60;
-        particles[index].ty = cy + 30 + Math.sin(a)*40;
-        index++;
+    for(let a=0;a<Math.PI && i<particles.length;a+=0.05){
+        particles[i].tx = cx + Math.cos(a)*R*0.45;
+        particles[i].ty = cy + R*0.25 + Math.sin(a)*R*0.3;
+        i++;
     }
 }
 
-setTimeout(buildSmile, 500);
+setTimeout(buildSmile, 600);
 
 /* Animación */
 function animate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     particles.forEach(p=>{
-        p.x += (p.tx - p.x)*0.12;
-        p.y += (p.ty - p.y)*0.12;
+        p.x += (p.tx - p.x)*0.15;
+        p.y += (p.ty - p.y)*0.15;
 
-        ctx.fillStyle = `hsl(${p.hue},85%,55%)`;
+        ctx.fillStyle = `hsl(${p.hue},80%,55%)`;
         ctx.beginPath();
         ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
         ctx.fill();
@@ -147,10 +175,12 @@ function animate(){
 }
 animate();
 
-onresize=()=>{
-    canvas.width=innerWidth;
-    canvas.height=innerHeight;
-};
+addEventListener("resize", ()=>{
+    resize();
+    createParticles();
+    buildSmile();
+});
 </script>
 
 </body>
+</html>
